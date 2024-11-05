@@ -57,9 +57,16 @@ public class ChatClient extends AbstractClient
    */
   public void handleMessageFromServer(Object msg) 
   {
-    clientUI.display(msg.toString());
-    
-    
+	  String out, type;
+	  String[] in = (String[]) msg;
+	  out = in[0];
+	  type = in[1];
+	  if (type.equals("client")) {
+		  clientUI.display(out); 
+	  } else {
+		  System.out.println("SYSTEM MSG> " + out);
+	  }
+	  
   }
 
   /**
@@ -98,13 +105,14 @@ public class ChatClient extends AbstractClient
    * This method displays message when connection to server closes.
    */
   protected void connectionClosed() {
-	  clientUI.display("Server has shutdown.");
+	  clientUI.display("Connection closed");
   }
   
   /*
    * This method calls quit() method when exception happens.
    */
   protected void connectionException(Exception exception) {
+	  clientUI.display("Server has shutdown.");
 	  quit();
   }
 }

@@ -4,8 +4,11 @@ package edu.seg2105.edu.server.backend;
 // license found at www.lloseng.com 
 
 
+import java.io.IOException;
+import java.util.ArrayList;
 import ocsf.server.*;
-
+import edu.seg2105.client.common.ChatIF;
+import edu.seg2105.edu.server.*;
 /**
  * This class overrides some of the methods in the abstract 
  * superclass in order to give more functionality to the server.
@@ -24,6 +27,8 @@ public class EchoServer extends AbstractServer
    */
   final public static int DEFAULT_PORT = 5555;
   
+  ChatIF serverUI;
+  
   //Constructors ****************************************************
   
   /**
@@ -31,9 +36,11 @@ public class EchoServer extends AbstractServer
    *
    * @param port The port number to connect on.
    */
-  public EchoServer(int port) 
+  public EchoServer(int port, ChatIF serverUI) throws IOException
   {
     super(port);
+    this.serverUI = serverUI;
+    listen();
   }
 
   
@@ -49,9 +56,10 @@ public class EchoServer extends AbstractServer
     (Object msg, ConnectionToClient client)
   {
     System.out.println("Message received: " + msg + " from " + client);
-    this.sendToAllClients(msg);
+    String[] item = {(String) msg, "client"};
+    this.sendToAllClients(item);
   }
-    
+  
   /**
    * This method overrides the one in the superclass.  Called
    * when the server starts listening for connections.
@@ -73,19 +81,33 @@ public class EchoServer extends AbstractServer
   }
   
   /**
-   * This method prints out the name of a new client that connects.
+   * This method prints out the new client that connects.
+   * @param client connection to client
    */
   protected void clientConnected(ConnectionToClient client) {
-	  System.out.println("New Client " + client.getName());
+	  System.out.println("New Client " + client);
   }
   
   /**
-   * This method prints out the name of a client that disconnects.
+   * This method prints out the client that disconnects.
+   * @param client connection to client
    */
   synchronized protected void clientDisconnected(ConnectionToClient client) {
-	  System.out.println("Client " + client.getName() + " disconnected");
+	  System.out.println("Client " + client + " disconnected");
   }
   
+  /**
+   * This method terminates the server.
+   */
+  public void quit()
+  {
+    try
+    {
+      close();
+    }
+    catch(IOException e) {}
+    System.exit(0);
+  }
   
   //Class methods ***************************************************
   
@@ -96,29 +118,6 @@ public class EchoServer extends AbstractServer
    * @param args[0] The port number to listen on.  Defaults to 5555 
    *          if no argument is entered.
    */
-  public static void main(String[] args) 
-  {
-    int port = 0; //Port to listen on
-
-    try
-    {
-      port = Integer.parseInt(args[0]); //Get port from command line
-    }
-    catch(Throwable t)
-    {
-      port = DEFAULT_PORT; //Set port to 5555
-    }
-	
-    EchoServer sv = new EchoServer(port);
-    
-    try 
-    {
-      sv.listen(); //Start listening for connections
-    } 
-    catch (Exception ex) 
-    {
-      System.out.println("ERROR - Could not listen for clients!");
-    }
-  }
+  
 }
 //End of EchoServer class
