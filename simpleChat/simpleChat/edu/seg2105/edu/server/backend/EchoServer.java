@@ -55,9 +55,30 @@ public class EchoServer extends AbstractServer
   public void handleMessageFromClient
     (Object msg, ConnectionToClient client)
   {
-    System.out.println("Message received: " + msg + " from " + client);
-    String[] item = {(String) msg, "client"};
-    this.sendToAllClients(item);
+	  String tmpMsg = (String)msg;
+	  System.out.println("Message received: " + tmpMsg + " from " + client.getInfo("id"));
+	  if (tmpMsg.length() >= 6 && tmpMsg.substring(0,6).equals("#login")) {
+		  if (client.getInfo("id") != null) {
+			  try {
+				  String[] out = {"Login ID should not be entered now.", "error"};
+				  client.sendToClient(out);
+				  client.close();
+			} catch (IOException e) {}
+		  }
+		  if (tmpMsg.length() >= 8) {
+			  client.setInfo("id", tmpMsg.substring(7));
+			  String[] out = {client.getInfo("id") + " has logged on.", "start"};
+			  System.out.println(out[0]);
+			  try {
+				client.sendToClient(out);
+			} catch (IOException e) {}
+		  }
+	  }
+	  else {
+		    String[] item = {tmpMsg, "c" + client.getInfo("id")};
+		    this.sendToAllClients(item);
+	  }
+    
   }
   
   /**
@@ -85,7 +106,7 @@ public class EchoServer extends AbstractServer
    * @param client connection to client
    */
   protected void clientConnected(ConnectionToClient client) {
-	  System.out.println("New Client " + client);
+	  System.out.println("A new client has connected to the server.");
   }
   
   /**
@@ -93,7 +114,7 @@ public class EchoServer extends AbstractServer
    * @param client connection to client
    */
   synchronized protected void clientDisconnected(ConnectionToClient client) {
-	  System.out.println("Client " + client + " disconnected");
+	  System.out.println("Client " + client.getInfo("id") + " disconnected");
   }
   
   /**

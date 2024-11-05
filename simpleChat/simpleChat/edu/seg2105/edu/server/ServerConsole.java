@@ -6,9 +6,7 @@ package edu.seg2105.edu.server;
 import java.io.*;
 import java.util.Scanner;
 
-import edu.seg2105.client.backend.ChatClient;
 import edu.seg2105.client.common.*;
-import edu.seg2105.client.ui.ClientConsole;
 import edu.seg2105.edu.server.backend.*;
 
 /**
